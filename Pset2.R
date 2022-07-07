@@ -2,8 +2,8 @@
 ############ Problem Set 2     ###############
 
 
-rm(list = ls())
-
+rm(list = ls(df))
+rm(df)
 ##########Carga de paquetes
 
 install.packages("car")
@@ -39,6 +39,12 @@ test_completa$P6585s2[test_completa$P6585s2 == 9] <- 3
 test_completa$P6585s3[test_completa$P6585s3 == 9] <- 3
 test_completa$P6585s4[test_completa$P6585s4 == 9] <- 3
 
+
+#convertir departamentos en factor
+
+test_completa$Dominio.x <- as.factor(test_completa$Dominio.x)
+
+class(test_completa$Dominio.x)
 
 ##### renombrear las etiquetas categoricas
 
@@ -83,6 +89,33 @@ test_completa <- test_completa %>%
          Sub_fam = P6585s3,
          Sub_educ= P6585s4)
 
+#### creamos variables de interacción y nuevas variables
+ test_completa <-  test_completa %>%
+   mutate(Mdll = Dominio.x,
+          Cali = Dominio.x,
+          Bqa = Dominio.x,
+          Qbd = Dominio.x,
+          Gjr = Dominio.x,
+          Edad2 = Edad^2,
+          Mujer = Genero)
+
+ #convertir mujer a numerico
+ 
+ test_completa$Mujer <- as.numeric(test_completa$Mujer)
+ 
+ class(test_completa$Mujer)
+ 
+ 
+ #se crean dummies para las variables de departamento
+ 
+ test_completa <- test_completa %>%
+   mutate( Muj_edad = Mujer*Edad
+          ,Mdll = factor(ifelse(Mdll =="MEDELLIN", 1, 0 )),
+          Cali = factor(ifelse(Cali =="CALI", 1, 0 )),
+          Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
+          Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
+          Gjr = factor(ifelse(Gjr =="RIOHACHA", 1, 0)))
+
 
 ##### Dejo solo las variables que voy a utilizar
 
@@ -111,7 +144,14 @@ test_com1 <- subset(test_completa, select = c(l_pob,
                                               Dominio.x,
                                               Nper,
                                               Npersug,
-                                              Orden))
+                                              Orden,
+                                              Muj_edad,
+                                              Edad2,
+                                              Mdll,
+                                              Cali,
+                                              Bqa ,
+                                              Qbd,
+                                              Gjr))
 
 
 ##### Merge de las bases de datos de Train
@@ -132,6 +172,10 @@ train_completa$P6585s1[train_completa$P6585s1 == 9] <- 3
 train_completa$P6585s2[train_completa$P6585s2 == 9] <- 3
 train_completa$P6585s3[train_completa$P6585s3 == 9] <- 3
 train_completa$P6585s4[train_completa$P6585s4 == 9] <- 3
+
+#convertir departamentos en factor
+
+train_completa$Dominio.x <- as.factor(train_completa$Dominio.x)
 
 
 ##### renombrear las etiquetas categoricas
@@ -175,10 +219,38 @@ train_completa <- train_completa %>%
          Sub_fam = P6585s3,
          Sub_educ= P6585s4)
 
+#### creamos variables de interacción y nuevas variables
+train_completa <-  train_completa %>%
+  mutate(Mdll = Dominio.x,
+         Cali = Dominio.x,
+         Bqa = Dominio.x,
+         Qbd = Dominio.x,
+         Gjr = Dominio.x,
+         Edad2 = Edad^2,
+         Mujer = Genero)
+
+#convertir mujer a numerico
+
+train_completa$Mujer <- as.numeric(train_completa$Mujer)
+
+class(train_completa$Mujer)
+
+
+#se crean dummies para las variables de departamento
+
+train_completa <- train_completa %>%
+  mutate( Muj_edad = Mujer*Edad
+          ,Mdll = factor(ifelse(Mdll =="MEDELLIN", 1, 0 )),
+          Cali = factor(ifelse(Cali =="CALI", 1, 0 )),
+          Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
+          Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
+          Gjr = factor(ifelse(Gjr =="RIOHACHA", 1, 0)))
+
+
 
 ##### Dejo solo las variables que voy a utilizar
 
-train_com1 <- subset(test_completa, select = c(l_pob, 
+train_com1 <- subset(train_completa, select = c(l_pob, 
                                               l_ind, 
                                               T_vivienda, 
                                               T_hab, 
@@ -208,7 +280,14 @@ train_com1 <- subset(test_completa, select = c(l_pob,
                                               Pobre,
                                               Indigente,
                                               Npobres,
-                                              Nindigentes))
+                                              Nindigentes,
+                                              Muj_edad,
+                                              Edad2,
+                                              Mdll,
+                                              Cali,
+                                              Bqa ,
+                                              Qbd,
+                                              Gjr))
 
 
 
