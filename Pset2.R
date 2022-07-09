@@ -151,7 +151,8 @@ test_com1 <- subset(test_completa, select = c(l_pob,
                                               Cali,
                                               Bqa ,
                                               Qbd,
-                                              Gjr))
+                                              Gjr, 
+                                              Oficio))
 
 
 ##### Merge de las bases de datos de Train
@@ -182,17 +183,17 @@ train_completa$Dominio.x <- as.factor(train_completa$Dominio.x)
 
 train_completa <- train_completa %>%
   mutate(Clase.x = factor(ifelse(Clase.x ==1, "cabecera (1)", "rural (0)" )),
-         P6020 = factor(ifelse(p6020 == 1, "Mujer", "Hombre")),
-         P6050 = factor(P6050, levels = c(1:9), labels = c("JEFE_H","Pareja_JH", "Hijo(a)", "Nieto", "Otro", "Empleado_S", "Pensionista", "Trabajador", "Otro_NP"  ),
+         P6020 = factor(ifelse(P6020 == 1, "Mujer", "Hombre")),
+         P6050 = factor(P6050, levels = c(1:9), labels = c("JEFE_H","Pareja_JH", "Hijo(a)", "Nieto", "Otro", "Empleado_S", "Pensionista", "Trabajador", "Otro_NP"  )),
                         P6210 = factor(P6210, levels = c(1:9), labels = c("Ninguno", "Preescolar","Basica_p","Basica_S","Media", "Superior_OU","","", "No sabe")),
                         P6240 = factor(P6240, levels = c(1:6), labels = c("Trabajando","Buscando_T","Estudiando", "Oficios_H", "Incapacitado_T", "Otra_A")),
                         P6430 = factor(P6430, levels = c(1:9), labels = c("Obrero_Part", "Obrero_Gov", "Emp_dom", "Cuenta_pro","Patron_Emp", "T_familiarnr", "T_NRotrosh", "Jornalero","otro")),
                         P5090 = factor(P5090, levels = c(1:6), labels = c("Propia_T", "Propia_p", "Arriendo", "Usufructo","Ocupante", "otra")),
-                        P6100 = factor(P6100, levels = c(1:4), labels = c("Contributivo", "Especial", "subsidiado", "No_ sabe")),
-                        P6585s1 = factor(P6585s1, levels = c(1:9), labels = c("si","no","no_sabe")),
-                        P6585s2 = factor(P6585s2, levels = c(1:9), labels = c("si","no","no_sabe")),
-                        P6585s3 = factor(P6585s3, levels = c(1:9), labels = c("si","no","no_sabe")),
-                        P6585s4 = factor(P6585s4, levels = c(1:9), labels = c("si","no","no_sabe"))))
+                        P6100 = factor(P6100, levels = c(1:4), labels = c("Contributivo", "Especial", "subsidiado", "No_sabe")),
+                        P6585s1 = factor(P6585s1, levels = c(1:3), labels = c("si","no","no_sabe")),
+                        P6585s2 = factor(P6585s2, levels = c(1:3), labels = c("si","no","no_sabe")),
+                        P6585s3 = factor(P6585s3, levels = c(1:3), labels = c("si","no","no_sabe")),
+                        P6585s4 = factor(P6585s4, levels = c(1:3), labels = c("si","no","no_sabe")))
 
 ##### renombramos el nombre de las variables
 
@@ -287,7 +288,9 @@ train_com1 <- subset(train_completa, select = c(l_pob,
                                               Cali,
                                               Bqa ,
                                               Qbd,
-                                              Gjr))
+                                              Gjr,
+                                              Oficio,
+                                              Ingtotugarr))
 
 
 
@@ -339,12 +342,15 @@ data.frame(table(test_completa$P6430))
 
 
 
+detectores()
 
 
+###############################################################################################################
 
 
+modelo1 <- lm(Ingtotugarr~factor(Dominio), train_hogares)
 
-
+ing_predicho <- predict(modelo1, newdata = test_hogares)
 
 
 
