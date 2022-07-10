@@ -2,7 +2,7 @@
 ############ Problem Set 2     ###############
 
 
-rm(list = ls(df))
+rm(list = ls())
 rm(df)
 ##########Carga de paquetes
 
@@ -18,6 +18,167 @@ library(huxtable) #regresiones de tablas
 
 
 ################################
+
+
+###### limpieza y manejo de las variables
+
+#recodificar variable de mujeres
+
+
+test_personas$P6020[test_personas$P6020 == 1] <- 0
+test_personas$P6020[test_personas$P6020 == 2] <- 1
+
+#crear variable para ver si es adulto
+
+test_personas <- test_personas %>%
+  mutate(P6240 = ifelse(P6240==1, 1,0),
+         P6040 = ifelse(P6040 >= 18, 1,0),
+         P6585s1 = ifelse(P6585s1==1, 1, 0),
+         P6585s2 = ifelse(P6585s2==1, 1, 0),
+         P6585s3 = ifelse(P6585s3==1, 1, 0),
+         P6585s4 = ifelse(P6585s4==1, 1, 0))
+
+#para generar la base completa
+
+modelo1 <- lm(Ingtot~factor(Oficio), train_personas)
+
+ing_predicho <- predict(modelo1, newdata = test_personas)
+
+head(ing_predicho)
+
+test_personas <- test_personas %>% 
+  mutate(ingreso = predict(modelo1, newdata = test_personas))
+
+#creamos un df para luego unir las variables
+
+rm(ingreso_test) 
+
+
+#volvemos 0 los NA en ingreso para sumar
+
+test_personas$ingreso[is.na(test_personas$ingreso)] <- 0
+test_personas$P6585s1[is.na(test_personas$P6585s1)] <- 0
+test_personas$P6585s2[is.na(test_personas$P6585s2)] <- 0
+test_personas$P6585s3[is.na(test_personas$P6585s3)] <- 0
+test_personas$P6585s4[is.na(test_personas$P6585s4)] <- 0
+
+
+# se hacen algunos mutate con las variables que necesitamos
+
+test_personas <- test_personas %>% group_by(id) %>%
+    mutate(ingreso_test = sum(ingreso),
+           num_mujeresh = sum(P6020),
+           mun_adulth = sum(P6040),
+           sub1 = sum(P6585s1),
+           sub2 = sum(P6585s2),
+           sub3 = sum(P6585s3),
+           sub4 = sum(P6585s4),
+           subsidio= ifelse(sub1+sub2+sub3+sub4 >0, 1,0))
+
+# Merge de las bases de datos de Test
+
+rm(Aurelio)
+
+test_completa <- merge(test_hogares, test_personas, by.x="id", by.y="id", all.x = TRUE, all.y = FALSE)
+           
+test_completa <- test_personas %>% group_by(id) %>%
+  summarise_each(funs=mean)
+
+
+##### renombramos el nombre de las variables
+
+
+test_completa <- test_completa %>%
+  rename(l_pob = Lp, 
+         l_ind = Li, 
+         T_vivienda = P5090, 
+         T_hab = P5000, 
+         Dormitorios = P5010, 
+         val_arriendo = P5130, 
+         Relacion_JH = P6050,
+         Reg_salud = P6100, 
+         Niv_educ = P6210,
+         Grado = P6210s1,
+         Temp_emp = P6426,
+         tipo_of = P6430,
+         horas_t =P6800,
+         cotiza_p = P6920,
+         Sub_Alim = P6585s1,
+         Sub_transp = P6585s2,
+         Sub_fam = P6585s3,
+         Sub_educ= P6585s4)
+
+##### Dejo solo las variables que voy a utilizar
+
+test_com1 <- subset(test_completa, select = c(l_pob, 
+                                              l_ind, 
+                                              T_vivienda, 
+                                              T_hab, 
+                                              Dormitorios, 
+                                              val_arriendo, 
+                                              Relacion_JH,
+                                              Reg_salud, 
+                                              Niv_educ,
+                                              Grado,
+                                              Temp_emp,
+                                              tipo_of,
+                                              horas_t,
+                                              cotiza_p,
+                                              id,
+                                              Clase,
+                                              Nper,
+                                              Npersug,
+                                              Orden,
+                                              ingreso_test,
+                                              num_mujeresh,
+                                              mun_adulth,
+                                              sub1,
+                                              sub2,
+                                              sub3,
+                                              sub4,
+                                              subsidio))
+
+test_com1 <- test_com1 %>%
+            mutate(Dominio = test_hogares$Dominio)
+
+
+#### creamos variables de interacci�n y nuevas variables
+test_completa <-  test_completa %>%
+  mutate(Mdll = Dominio,
+         Cali = Dominio,
+         Bqa = Dominio,
+         Qbd = Dominio,
+         Rioh = Dominio)
+
+#se crean dummies para las variables de departamento
+
+test_completa <- test_completa %>%
+  mutate( Muj_edad = Mujer*Edad
+          ,Mdll = factor(ifelse(Mdll =="MEDELLIN", 1, 0 )),
+          Cali = factor(ifelse(Cali =="CALI", 1, 0 )),
+          Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
+          Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
+          Gjr = factor(ifelse(Gjr =="RIOHACHA", 1, 0)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##### Merge de las bases de datos de Test
@@ -348,10 +509,42 @@ detectores()
 ###############################################################################################################
 
 
-modelo1 <- lm(Ingtotugarr~factor(Dominio), train_hogares)
+modelo1 <- lm(Ingtot~factor(Oficio), train_personas)
 
-ing_predicho <- predict(modelo1, newdata = test_hogares)
+ing_predicho <- predict(modelo1, newdata = test_personas)
 
+head(ing_predicho)
+
+test_completa <- test_personas %>% 
+                mutate(ingreso = predict(modelo1, newdata = test_personas))
+
+install.packages("doBy")
+library("doBy")
+
+#volvemos 0 los NA en ingreso para sumar
+
+test_completa$ingreso[is.na(test_completa$ingreso)] <- 0
+
+
+
+test_completa <- test_completa %>% 
+  mutate(ingreso_hogar = aggregate(ingreso,by = id, FUN = sum))
+    
+#para no da�ar la base original creamos una que contenga la variable collapsada
+
+ingreso_train <- df
+
+# agregate es para collapsar
+
+ingreso_train <- aggregate(test_completa$ingreso, by = list(test_completa$id), FUN = sum)
+
+
+
+
+
+#unimos las bases nuevamente
+
+test_completa <- merge(test_hogares, test_personas, by.x="id", by.y="id", all.x = TRUE, all.y = FALSE)
 
 
 
@@ -377,6 +570,7 @@ ing_predicho <- predict(modelo1, newdata = test_hogares)
 # armadas, ecopetrol, universidades públicas) c. Subsidiado? (eps-s) d. No sabe, no informa 
 ## p6210 Nivel educativo categórica
 ## P6210s1 Grado escolar en númerico
+#P6240 si est� trabajando o buscando trabajo estudiando
 ## P6426 c ¿cuanto tiempo lleva ... Trabajando en esta empresa, negocio, industria, oficina, firma o finca de manera continua? 
 ## P6430 En este trabajo…..es: a. Obrero o empleado de empresa particular b. Obrero o empleado del gobierno c. Empleado
 ##doméstico d. Trabajador por cuenta propia e. Patrón o empleador f. Trabajador familiar sin remuneración g. Trabajador sin
