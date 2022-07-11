@@ -1,16 +1,48 @@
+########################
 #clasificación
+###################
+install.packages("caret")
+install.packages("rio")
+install.packages("modelsummary")
+install.packages("gamlr")
+install.packages("class")
+install.packages("lmtest")
+install.packages("AER")
+
+library(caret)
+library(rio)
+library(modelsummary)
+library(gamlr)
+library(class)
+library(lmtest)
+library(AER)
+#########
+#Partimos test para crear evaluación
+set.seed(1712)
+split2 <- createDataPartition(test_completa_1$pobreza, p= 1/3) [[1]]
+evaluation <- test_completa_1[split2,]
+test <- test_completa_1[-split2,]
+
 
 #Logit Lasso
+
+#Función#
+ctrl_def <- trainControl(method = "cv",
+                         number = 5,
+                         summaryFunction = defaultSummary,
+                         classProbs = TRUE,
+                         verbose=FALSE,
+                         savePredictions = T)
++ Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh = train_completa_1
+##
 set.seed(1712)
-mylogit lasso downsample <- train(
-  Default ~amount+installment+age+ historygood + historypoor + purposeusedcar+ purposegoods.repair + purposeedu + foreigngerman + rentTRdata = downSampledTrain,
-  method = "glmnet",
-  trControl = ctrl,
+Log_lasso <- train(
+  pobreza ~ Clase + subsidio , data = test_completisima,
+  method = "glm",
+  trControl = ctrl_def,
   family = "binomial",
-  metric = "ROC",
-  tuneGrid = expand.grid(alpha = 0,lambda=lambda grid),
   preProcess = c("center", "scale")
 )
 #probit Elastic Net
+summarise(test_completa_1$pobreza)
 
-#

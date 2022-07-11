@@ -28,6 +28,8 @@ library(huxtable) #regresiones de tablas
 test_personas$P6020[test_personas$P6020 == 1] <- 0
 test_personas$P6020[test_personas$P6020 == 2] <- 1
 
+
+
 #crear variable para ver si es adulto
 
 test_personas <- test_personas %>%
@@ -94,7 +96,7 @@ test_completa <- test_completa %>%
 
 
 
-#### creamos variables de interacci?n y nuevas variables
+#### creamos variables de ciudad
 test_completa <-  test_completa %>%
   mutate(Mdll = Dominio,
          Cali = Dominio,
@@ -110,6 +112,11 @@ test_completa <- test_completa %>%
           Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
           Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
           Rioh = factor(ifelse(Rioh =="RIOHACHA", 1, 0)))
+
+#recodificar variable cabecera
+
+test_completa$Clase[test_completa$Clase == 1] <- 0
+test_completa$Clase[test_completa$Clase == 2] <- 1
 
 ####################
 #Replicamos para train
@@ -198,19 +205,60 @@ test_completa <- test_completa %>%
           Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
           Rioh = factor(ifelse(Rioh =="RIOHACHA", 1, 0)))
 
+#recodificar variable cabecera
+
+train_completa$Clase[train_completa$Clase == 1] <- 0
+train_completa$Clase[train_completa$Clase == 2] <- 1
+
+
 ###########################################
 #creamos línea de pobreza para las dos bases
+
 train_completa <- train_completa %>%
   mutate(
     pobreza = ifelse(ingreso<l_pob,1,0)
   )
 summary(train_completa$pobreza)
 
+
+
 test_completa <- test_completa %>%
   mutate(
     pobreza = ifelse(ingreso_test<l_pob,1,0)
   )
-summary(test_completa$pobreza)
+summary(test_completa_1$pobreza)
+
+
+test_completa_1$T_hab[is.na(test_completa_1$T_hab)] <- 0
+
+sum(is.na(test_completa_1$T_hab))
+###
+
+test_completa_1 <- test_completa %>%
+  mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, 1, 0 )),
+         T_hab=factor(T_hab,levels=c(1:13)),
+         Dormitorios=factor(Dormitorios,levels=c(1:9)),
+         Clase = factor(ifelse(test_completa$Clase == 1, 1, 0 )),
+         num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
+         mun_adulth = factor(mun_adulth, levels=c(1:19)),
+         subsidio = factor(ifelse(test_completa$subsidio == 1, 1, 0 ))
+         )
+
+#Eliminamos NA
+test_completisima <- test_completa_1[!is.na(test_completa_1$T_hab), ]
+
+
+train_completa_1 <- train_completa %>%
+  mutate(pobreza = factor(pobreza, levels=c(1,0), labels=c("Si", "No")),
+         T_hab=factor(T_hab,levels=c(1:13)),
+         Dormitorios=factor(Dormitorios,levels=c(1:9)),
+         Clase = factor(ifelse(train_completa$Clase == 1, 1, 0 )),
+         num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
+         mun_adulth = factor(mun_adulth, levels=c(1:19)),
+         subsidio = factor(ifelse(train_completa$subsidio == 1, 1, 0 ))
+  )
+
+
 
 
 #Fin de armado de bases
