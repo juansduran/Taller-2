@@ -29,20 +29,26 @@ test <- test_completa_1[-split2,]
 #Función#
 ctrl_def <- trainControl(method = "cv",
                          number = 5,
-                         summaryFunction = defaultSummary,
-                         classProbs = TRUE,
-                         verbose=FALSE,
                          savePredictions = T)
-+ Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh = train_completa_1
+
+T_hab + Dormitorios+ Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh = train_completa_1
 ##
 set.seed(1712)
 Log_lasso <- train(
-  pobreza ~ Clase + subsidio , data = test_completisima,
+  pobreza ~  Clase + subsidio, data = test_completisima,
   method = "glm",
   trControl = ctrl_def,
   family = "binomial",
-  preProcess = c("center", "scale")
+  
 )
+Log_lasso
 #probit Elastic Net
 summarise(test_completa_1$pobreza)
 
+##########
+set.seed(1712)
+Log_lasso <- train(
+  pobreza ~ T_hab + Dormitorios + Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh , data = test_completisima,
+  method = "knn",
+  trControl = ctrl_def,
+)
