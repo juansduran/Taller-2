@@ -3,7 +3,7 @@
 
 
 rm(list = ls())
-rm(df)
+
 ##########Carga de paquetes
 
 install.packages("car")
@@ -245,7 +245,7 @@ test_completa_1 <- test_completa %>%
          )
 
 #Eliminamos NA
-test_completisima <- test_completa_1[!is.na(test_completa_1$T_hab), ]
+
 
 
 train_completa_1 <- train_completa %>%
@@ -255,7 +255,7 @@ train_completa_1 <- train_completa %>%
          Clase = factor(ifelse(train_completa$Clase == 1, 1, 0 )),
          num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
          mun_adulth = factor(mun_adulth, levels=c(1:19)),
-         subsidio = factor(ifelse(train_completa$subsidio == 1, 1, 0 ))
+         subsidio = factor(subsidio, levels=c(1,0), labels = c("Si", "No"))
   )
 
 

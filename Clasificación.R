@@ -9,6 +9,9 @@ install.packages("class")
 install.packages("lmtest")
 install.packages("AER")
 
+T_hab + Dormitorios+ Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh = train_completa_1
+##
+
 library(caret)
 library(rio)
 library(modelsummary)
@@ -24,24 +27,33 @@ evaluation <- test_completa_1[split2,]
 test <- test_completa_1[-split2,]
 
 
-#Logit Lasso
+#Logit
 
 #Función#
 ctrl_def <- trainControl(method = "cv",
                          number = 5,
-                         savePredictions = T)
+                         savePredictions = TRUE,
+                         classProbs = TRUE)
 
-T_hab + Dormitorios+ Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh = train_completa_1
-##
 set.seed(1712)
-Log_lasso <- train(
-  pobreza ~  Clase + subsidio, data = test_completisima,
+Logit_prueba <- train(
+  pobreza ~  subsidio , data = test_completa_1,
   method = "glm",
   trControl = ctrl_def,
-  family = "binomial",
+  family = "binomial"
   
 )
-Log_lasso
+
+set.seed(1712)
+logit_prueba_1 <- train(
+  pobreza ~  T_hab + Dormitorios + Clase + subsidio, data = test_completisima,
+  method = "glm",
+  trControl = ctrl_def,
+  family = "binomial"
+)
+Logit_prueba
+logit_prueba_1
+
 #probit Elastic Net
 summarise(test_completa_1$pobreza)
 
