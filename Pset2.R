@@ -198,9 +198,14 @@ train_completa <-  train_completa %>%
 
 #se crean dummies para las variables de departamento
 
+<<<<<<< HEAD
 
 train_completa <- train_completa %>%
   mutate( Mdll = factor(ifelse(Mdll =="MEDELLIN", 1, 0 )),
+=======
+test_completa <- test_completa %>%
+  mutate( Mdll = factor(ifelse(Mdll =="MEDELLIN", "si", "no" )),
+>>>>>>> a0e72f9cc11be08481ed07cb28659f2bd04af75e
           Cali = factor(ifelse(Cali =="CALI", 1, 0 )),
           Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
           Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
@@ -256,12 +261,36 @@ test_completa <- test_completa %>%
 
 
 
+<<<<<<< HEAD
 train_completa <- train_completa %>%
   mutate(pobreza = factor(pobreza, levels=c(1,0), labels=c("Si", "No"))
  )
+=======
+train_completa_1 <- train_completa %>%
+  mutate(pobreza = factor(pobreza, levels=c(1,0), labels=c("Si", "No")),
+         T_hab=factor(T_hab,levels=c(1:13),labels = c("1","2","3","4","5","6","7","8","9","10","11","12","13")),
+         Dormitorios=factor(Dormitorios,levels=c(1:9), labels = c("1","2","3","4","5","6","7","8","9")),
+         Clase = factor(Clase,levels=c(1,0), labels=c("Si", "No")),
+         num_mujeresh = factor(num_mujeresh, levels=c(1:13),labels = c("1","2","3","4","5","6","7","8","9","10","11","12","13")),
+         mun_adulth = factor(mun_adulth, levels=c(1:19),labels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19")),
+         subsidio = factor(subsidio, levels=c(1,0), labels = c("Si", "No"))
+  )
+>>>>>>> a0e72f9cc11be08481ed07cb28659f2bd04af75e
+
+factor((train_completa_1$Pobre), levels = c(0, 1), labels = c("No", "si"))
 
 
+test_completa_1 <- test_completa %>%
+  mutate( Mdll = factor(Mdll =="MEDELLIN",levels=c(1,0), labels = c("Si","No")),
+          Cali = factor(Cali =="CALI",levels=c(1,0), labels = c("Si", "No")),
+          Bqa = factor(Bqa =="BARRANQUILLA",levels=c(1,0), labels=c("Si", "No")),
+          Qbd = factor(Qbd =="QUIBDO",levels=c(1,0), labels=c("Si", "No")),
+          Rioh = factor(Rioh =="RIOHACHA",levels=c(1,0), labels=c("Si", "No")))
 
+
+          
+                               
+                               data.frame(table(train_completa_1$mun_adulth))
 
 #Fin de armado de bases
 

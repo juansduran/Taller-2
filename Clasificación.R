@@ -30,6 +30,9 @@ split2 <- createDataPartition(test_completa$pobreza, p= 1/3) [[1]]
 evaluation <- test_completa[split2,]
 test <- test_completa[-split2,]
 
+train_completa_1$Pobre <- factor((train_completa_1$Pobre), levels = c(0, 1), labels = c("No", "si"))
+train_completa_1$subsidio <- factor((train_completa_1$subsidio), levels = c(0, 1), labels = c("No", "si"))
+
 
 #Logit
 
