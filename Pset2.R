@@ -1,7 +1,7 @@
 ###############################################
 ############ Problem Set 2     ###############
 
-
+rm(test_completa_1)
 rm(list = ls())
 
 ##########Carga de paquetes
@@ -198,13 +198,13 @@ train_completa <-  train_completa %>%
 
 #se crean dummies para las variables de departamento
 
-test_completa <- test_completa %>%
+
+train_completa <- train_completa %>%
   mutate( Mdll = factor(ifelse(Mdll =="MEDELLIN", 1, 0 )),
           Cali = factor(ifelse(Cali =="CALI", 1, 0 )),
           Bqa = factor(ifelse(Bqa =="BARRANQUILLA", 1, 0)),
           Qbd = factor(ifelse(Qbd =="QUIBDO", 1, 0)),
           Rioh = factor(ifelse(Rioh =="RIOHACHA", 1, 0)))
-
 #recodificar variable cabecera
 
 train_completa$Clase[train_completa$Clase == 1] <- 0
@@ -226,37 +226,39 @@ test_completa <- test_completa %>%
   mutate(
     pobreza = ifelse(ingreso_test<l_pob,1,0)
   )
-summary(test_completa_1$pobreza)
+summary(test_completa$pobreza)
 
 
-test_completa_1$T_hab[is.na(test_completa_1$T_hab)] <- 0
+#test_completa_1$T_hab[is.na(test_completa_1$T_hab)] <- 0
 
-sum(is.na(test_completa_1$T_hab))
+#sum(is.na(test_completa_1$T_hab))
 ###
 
-test_completa_1 <- test_completa %>%
-  mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, 1, 0 )),
-         T_hab=factor(T_hab,levels=c(1:13)),
-         Dormitorios=factor(Dormitorios,levels=c(1:9)),
-         Clase = factor(ifelse(test_completa$Clase == 1, 1, 0 )),
-         num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
-         mun_adulth = factor(mun_adulth, levels=c(1:19)),
-         subsidio = factor(ifelse(test_completa$subsidio == 1, 1, 0 ))
-         )
+test_completa <- test_completa %>%
+  mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, "Si", "No" )),
+         Clase = factor(ifelse(test_completa$Clase == 1, "Si", "No" )),
+         subsidio = factor(ifelse(test_completa$subsidio == 1, "Si", "No" ))
+  )
+
+
+
+#test_completa_1 <- test_completa %>%
+ # mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, "Si", "No" )),
+  #       T_hab=factor(T_hab,levels=c(1:13)),
+   #      Dormitorios=factor(Dormitorios,levels=c(1:9)),
+    #     Clase = factor(ifelse(test_completa$Clase == 1, 1, 0 )),
+     #    num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
+      #   mun_adulth = factor(mun_adulth, levels=c(1:19)),
+       #  subsidio = factor(ifelse(test_completa$subsidio == 1, 1, 0 ))
+        # )
 
 #Eliminamos NA
 
 
 
-train_completa_1 <- train_completa %>%
-  mutate(pobreza = factor(pobreza, levels=c(1,0), labels=c("Si", "No")),
-         T_hab=factor(T_hab,levels=c(1:13)),
-         Dormitorios=factor(Dormitorios,levels=c(1:9)),
-         Clase = factor(ifelse(train_completa$Clase == 1, 1, 0 )),
-         num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
-         mun_adulth = factor(mun_adulth, levels=c(1:19)),
-         subsidio = factor(subsidio, levels=c(1,0), labels = c("Si", "No"))
-  )
+train_completa <- train_completa %>%
+  mutate(pobreza = factor(pobreza, levels=c(1,0), labels=c("Si", "No"))
+ )
 
 
 
