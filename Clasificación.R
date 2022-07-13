@@ -16,6 +16,8 @@ library(gamlr)
 library(class)
 library(lmtest)
 library(AER)
+library(huxtable)
+library(tidyverse)
 #########
 
 
@@ -52,7 +54,7 @@ ctrl_def <- trainControl(method = "cv",
 #Modelo 1 Logit Lasso sin sampling
 set.seed(1712)
 Logit_lasso <- train(
-  pobreza ~  vardesc, data = train_completa,
+  pobreza ~  ClaseNum + T_hab +  Dormitorios + Nper + num_mujeresh + mun_adulth + Mdll + Cali + Bqa + Qbd + Rioh + Dormitorios2 + fam_rural, data = train_completa,
   method = "glmnet",
   trControl = ctrl_def,
   family = "binomial",
@@ -97,6 +99,11 @@ USTrain <- upSample(x = train_completa,
                       y = train_completa$pobreza,
                       yname = "pobreza")
 set.seed(1712)
+USTest <- upSample(x = test,
+                    y = test$pobreza,
+                    yname = "pobreza")
+
+set.seed(1712)
 logit_US <- train(
   pobreza ~ ClaseNum + T_hab +  Dormitorios + Nper + num_mujeresh + mun_adulth + Mdll + Cali + Bqa + Qbd + Rioh + Dormitorios2 + fam_rural, data = USTrain,
   method = "glmnet",
@@ -107,9 +114,19 @@ logit_US <- train(
   preProcess = c("center", "scale")
 )
 logit_US
+##Corremos predichos
+logit_US_test <- train(
+  pobreza ~ ClaseNum + T_hab +  Dormitorios + Nper + num_mujeresh + mun_adulth + Mdll + Cali + Bqa + Qbd + Rioh + Dormitorios2 + fam_rural, data = test,
+  method = "glmnet",
+  trControl = ctrl_def,
+  family = "binomial",
+  metric = "Sens",
+  tuneGrid = expand.grid(alpha = 1,lambda=0.192563),
+  preProcess = c("center", "scale")
+)
 
-
-
+pred_log<-predict(logit_US_test)
+pred_log
 ###
 ##Modelo 5 Logit Lasso Down sapmle sin ciudad
 set.seed(1712)
@@ -123,7 +140,7 @@ logit_DS <- train(
   trControl = ctrl_def,
   family = "binomial",
   metric = "Sens",
-  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grilla),
+  tuneGrid = expand.grid(alpha = 0,lambda=0.4045618),
   preProcess = c("center", "scale")
 )
 logit_DS
@@ -146,6 +163,11 @@ Reg_DS <- train(
 )
 Reg_DS
 
+Reg_DS_test<-lm(ingreso_test ~ T_hab + Dormitorios + Clase + num_mujeresh + mun_adulth + subsidio + Mdll + Cali + Bqa + Qbd + Rioh + Dormitorios2 + fam_rural, data = test)
+Reg_ds_pred<-predict(Reg_DS_test)
+Barbara<-data.frame( Reg_ds_pred, test$l_pob )
+Barbara_pred<- Barbara %>%
+  mutate(pred_reg = ifelse(Reg_ds_pred < test.l_pob, 1,0))
 ##Modelo 2 Reg upsample completa
 set.seed(1712)
 Reg_US <- train(
@@ -179,3 +201,20 @@ Reg_normi_pre <- train(
   preProcess = c("center", "scale")  
 )
 Reg_normi_pre
+
+#El mejor modelo es el 1, se convertirá el ingreso predicho en valor binario.
+Predichos <- data.frame()
+
+Predichos <- data.frame(test$id, pred_log,Barbara_pred$pred_reg)
+
+CSVFINAL <- Predichos %>%
+  mutate(id=test.id,
+         pobre_clasificacion=ifelse(pred_log=="Si",1,0),
+         pobre_ingreso=Barbara_pred.pred_reg)
+CerezoDuran <- CSVFINAL[ -c(1:3) ]
+
+#Exportamos el archivo con predicciones
+write.csv(CerezoDuran,"C:/Users/pcere/Dropbox/Machine Learning/ml-taller2/Taller-2\\CerezoDuran.csv", row.names = T)
+
+#Fin del script
+
