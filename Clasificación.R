@@ -17,12 +17,37 @@ library(class)
 library(lmtest)
 library(AER)
 #########
+
+########################################################
+#variables de interacci�n
+
+#### Test
+
+test_completa <-  test_completa %>%
+  mutate(ClaseNum = as.numeric(Clase) )
+
+test_completa <- test_completa %>%
+mutate(Dormitorios2 = Dormitorios^2,
+       fam_rural = ClaseNum*Nper)
+#### Train
+
+
+train_completa <-  train_completa %>%
+  mutate(ClaseNum = as.numeric(Clase) )
+
+train_completa <- train_completa %>%
+  mutate(Dormitorios2 = Dormitorios^2,
+         fam_rural = ClaseNum*Nper)
+
+
+vardesc <- c("ClaseNum", "T_hab", "Dormitorios", "Nper", "num_mujeresh", "mun_adulth", "Mdll", "Cali", "Bqa", "Qbd", "Rioh", "Dormitorios2", "fam_rural" )
+
+########################################################
 #Creamos una función para obtener todos los resultados que necesitamos de los modelos
 FiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
 #Creamos grilla para Lasso
 lambda_grilla <- 10^seq(-4, 0.01, length = 200)
 lambda_grilla
-
 
 #Partimos test para crear evaluación
 set.seed(1712)
