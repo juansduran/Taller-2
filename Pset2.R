@@ -18,6 +18,11 @@ library(huxtable) #regresiones de tablas
 
 
 ################################
+##Cargamos las bases
+test_hogares <- readRDS("C:/Users/pcere/Dropbox/Machine Learning/ml-taller2/Taller-2/test_hogares.Rds")
+test_personas <- readRDS("C:/Users/pcere/Dropbox/Machine Learning/ml-taller2/Taller-2/test_personas.Rds")
+train_hogares <- readRDS("C:/Users/pcere/Dropbox/Machine Learning/ml-taller2/Taller-2/train_hogares.Rds")
+train_personas <- readRDS("C:/Users/pcere/Dropbox/Machine Learning/ml-taller2/Taller-2/train_personas.Rds")
 
 
 ###### limpieza y manejo de las variables
@@ -226,36 +231,42 @@ summary(train_completa$pobreza)
 test_completa <- test_completa %>%
   mutate( pobreza = ifelse(ingreso_test<l_pob,1,0))
 
-summary(test_completa$pobreza)
+summary(train_completa$pobreza)
 
 
-#test_completa_1$T_hab[is.na(test_completa_1$T_hab)] <- 0
 
-#sum(is.na(test_completa_1$T_hab))
-###
+###Volcemos factor
 
 test_completa <- test_completa %>%
   mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, "Si", "No" )),
          Clase = factor(ifelse(test_completa$Clase == 1, "Si", "No" )),
-         subsidio = factor(ifelse(test_completa$subsidio == 1, "Si", "No" )))
+         subsidio = factor(ifelse(test_completa$subsidio == 1, "Si", "No" ))
+         )
+train_completa <- train_completa %>%
+  mutate(pobreza = factor(ifelse(train_completa$pobreza == 1, "Si", "No" )),
+         Clase = factor(ifelse(train_completa$Clase == 1, "Si", "No" )),
+         subsidio = factor(ifelse(train_completa$subsidio == 1, "Si", "No" ))
+         )
 
+########################################################
+#variables de interacción
 
+#### Test
 
-#test_completa_1 <- test_completa %>%
- # mutate(pobreza = factor(ifelse(test_completa$pobreza == 1, "Si", "No" )),
-  #       T_hab=factor(T_hab,levels=c(1:13)),
-   #      Dormitorios=factor(Dormitorios,levels=c(1:9)),
-    #     Clase = factor(ifelse(test_completa$Clase == 1, 1, 0 )),
-     #    num_mujeresh = factor(num_mujeresh, levels=c(1:13)),
-      #   mun_adulth = factor(mun_adulth, levels=c(1:19)),
-       #  subsidio = factor(ifelse(test_completa$subsidio == 1, 1, 0 ))
-        # )
+test_completa <-  test_completa %>%
+  mutate(ClaseNum = as.numeric(Clase) )
 
-#Eliminamos NA
+test_completa <- test_completa %>%
+  mutate(Dormitorios2 = Dormitorios^2,
+         fam_rural = ClaseNum*Nper)
 
+train_completa <-  train_completa %>%
+  mutate(ClaseNum = as.numeric(Clase) )
 
+train_completa <- train_completa %>%
+  mutate(Dormitorios2 = Dormitorios^2,
+         fam_rural = ClaseNum*Nper)
                                
-                               data.frame(table(train_completa_1$mun_adulth))
 
 #Fin de armado de bases
 
